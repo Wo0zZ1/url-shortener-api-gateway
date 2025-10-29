@@ -63,11 +63,11 @@ export class AuthHttpClient {
 
 	async registerUser(
 		registerDto: RegisterUserDto,
-		guestUUID?: string,
+		guestUuid?: string,
 	): Promise<{ createdUser: UserEntity }> {
 		try {
-			const url = guestUUID
-				? `${this.baseUrl}/auth/register-user?guestUUID=${guestUUID}`
+			const url = guestUuid
+				? `${this.baseUrl}/auth/register-user?guestUuid=${guestUuid}`
 				: `${this.baseUrl}/auth/register-user`
 
 			const response = await firstValueFrom(
@@ -84,16 +84,12 @@ export class AuthHttpClient {
 
 	async login(
 		loginDto: LoginDto,
-		guestUUID?: string,
+		guestUuid?: string,
 	): Promise<{ user: UserDataFromAccessTokenPayload; tokens: Tokens }> {
 		try {
-			const url = guestUUID
-				? `${this.baseUrl}/auth/login?guestUUID=${guestUUID}`
-				: `${this.baseUrl}/auth/login`
-
 			const response = await firstValueFrom(
-				this.httpService.post<LoginResponse>(url, loginDto, {
-					headers: this.getGatewayHeaders(),
+				this.httpService.post<LoginResponse>(`${this.baseUrl}/auth/login`, loginDto, {
+					headers: { ...this.getGatewayHeaders(), 'x-guest-uuid': guestUuid },
 				}),
 			)
 			return response.data

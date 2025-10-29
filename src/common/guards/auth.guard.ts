@@ -23,11 +23,28 @@ export class AuthGuard implements CanActivate {
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest<RequestWithUser>()
 
-		const guestUUID = request.headers['x-guest-uuid'] as string | undefined
-
-		if (guestUUID) {
+		// Check Authorization Bearer token
+		const accessToken = this.extractTokenFromHeader(request)
+		if (accessToken)
 			try {
-				const guestUser = await this.usersHttpClient.findByUUIDPublic(guestUUID)
+				const userPayload = await this.authHttpClient.getCurrentUser(accessToken)
+
+				request.user = userPayload
+
+				request.headers['x-user-id'] = String(userPayload.sub)
+				request.headers['x-user-type'] = userPayload.type
+				if (userPayload.uuid) request.headers['x-user-uuid'] = userPayload.uuid
+
+				return true
+			} catch {
+				throw new UnauthorizedException('Invalid or expired access token')
+			}
+
+		// Check Guest UUID
+		const guestUuid = request.headers['x-guest-uuid'] as string | undefined
+		if (guestUuid)
+			try {
+				const guestUser = await this.usersHttpClient.findByUUIDPublic(guestUuid)
 
 				if (!guestUser || guestUser.type !== 'Guest')
 					throw new UnauthorizedException('Invalid guest UUID')
@@ -46,25 +63,8 @@ export class AuthGuard implements CanActivate {
 			} catch {
 				throw new UnauthorizedException('Invalid guest UUID')
 			}
-		}
 
-		const accessToken = this.extractTokenFromHeader(request)
-		if (!accessToken)
-			throw new UnauthorizedException('Access token or guest UUID is required')
-
-		try {
-			const userPayload = await this.authHttpClient.getCurrentUser(accessToken)
-
-			request.user = userPayload
-
-			request.headers['x-user-id'] = String(userPayload.sub)
-			request.headers['x-user-type'] = userPayload.type
-			if (userPayload.uuid) request.headers['x-user-uuid'] = userPayload.uuid
-
-			return true
-		} catch {
-			throw new UnauthorizedException('Invalid or expired access token')
-		}
+		throw new UnauthorizedException('Access token or guest UUID is required')
 	}
 
 	private extractTokenFromHeader(request: Request): string | undefined {

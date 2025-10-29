@@ -52,7 +52,7 @@ export class ResourceOwnerGuard implements CanActivate {
 
 		if (request.user.type === 'User') {
 			const resourceUserId = Number(resourceIdentifier)
-			isOwner = !isNaN(resourceUserId) && request.user.sub === resourceUserId
+			if (!isNaN(resourceUserId)) isOwner = request.user.sub === resourceUserId
 		} else if (request.user.type === 'Guest') {
 			const resourceUserId = Number(resourceIdentifier)
 			if (!isNaN(resourceUserId)) isOwner = request.user.sub === resourceUserId

@@ -184,12 +184,12 @@
 							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"username\": \"testuser\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/register-user?guestUUID={{guestUuid}}",
+							"raw": "{{baseUrl}}/auth/register-user?guestUuid={{guestUuid}}",
 							"host": ["{{baseUrl}}"],
 							"path": ["auth", "register-user"],
 							"query": [
 								{
-									"key": "guestUUID",
+									"key": "guestUuid",
 									"value": "{{guestUuid}}",
 									"description": "Optional: UUID гостя для привязки данных"
 								}

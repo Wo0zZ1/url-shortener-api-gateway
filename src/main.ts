@@ -31,6 +31,11 @@ async function bootstrap() {
 			{ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
 			'access-token',
 		)
+		.addSecurity('x-guest-uuid', {
+			type: 'apiKey',
+			in: 'header',
+			name: 'x-guest-uuid',
+		})
 		.build()
 
 	const document = SwaggerModule.createDocument(app, swaggerConfig)

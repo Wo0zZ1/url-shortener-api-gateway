@@ -1733,10 +1733,10 @@
     "@webassemblyjs/ast" "1.14.1"
     "@xtuc/long" "4.2.2"
 
-"@wo0zz1/url-shortener-shared@^0.1.20":
-  version "0.1.20"
-  resolved "https://registry.yarnpkg.com/@wo0zz1/url-shortener-shared/-/url-shortener-shared-0.1.20.tgz#4b215e7384a62b12074958ef020859a03fdf1584"
-  integrity sha512-Qye0k5cp8IK86MQ7Nbuhq3rS1KE+IfugudQw6f3CNNHwkP2YBk9dxP7eA7tzBgk2P0sMj4uxlf8pmw7Cpck4Fw==
+"@wo0zz1/url-shortener-shared@^0.1.23":
+  version "0.1.23"
+  resolved "https://registry.yarnpkg.com/@wo0zz1/url-shortener-shared/-/url-shortener-shared-0.1.23.tgz#0192ecffedd94c8d0aa61c286c324c453f0197db"
+  integrity sha512-GsD/aPKfFigfjLk+fgLgB6Ltin2jntKCmCRE7ir2TJdgNGq57VxrPNYkbpUlqP0ji3BQNY3xsGW/MZwIvetxig==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"

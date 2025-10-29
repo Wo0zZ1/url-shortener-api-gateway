@@ -33,13 +33,21 @@ import {
 
 import { getUserHeaders } from '../common/utils'
 import { UsersHttpClient } from '../common/clients'
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiSecurity } from '@nestjs/swagger'
 
 @Controller('users')
+@ApiTags('Users')
+@ApiBearerAuth('access-token')
+@ApiSecurity('x-guest-uuid')
 @UseGuards(AuthGuard)
 export class UsersController {
 	constructor(private readonly usersHttpClient: UsersHttpClient) {}
 
 	@Get()
+	@ApiOperation({ 
+		summary: 'Get all users', 
+		description: 'Get list of all users. Requires admin privileges.' 
+	})
 	@UseGuards(AdminGuard)
 	async findAll(@Req() request: Request): Promise<GetAllUsersResponse> {
 		const userHeaders = getUserHeaders(request)
@@ -47,6 +55,10 @@ export class UsersController {
 	}
 
 	@Get('id/:id')
+	@ApiOperation({ 
+		summary: 'Get user by ID', 
+		description: 'Get user information by numeric ID. Requires authentication and ownership verification.' 
+	})
 	@ResourceOwner('id', 'params')
 	@UseGuards(ResourceOwnerGuard)
 	async findById(
@@ -58,6 +70,10 @@ export class UsersController {
 	}
 
 	@Get('uuid/:uuid')
+	@ApiOperation({ 
+		summary: 'Get user by UUID', 
+		description: 'Get user information by UUID (for guests). Requires authentication and ownership verification.' 
+	})
 	@ResourceOwner('uuid', 'params')
 	@UseGuards(ResourceOwnerGuard)
 	async findByUUID(
@@ -69,6 +85,10 @@ export class UsersController {
 	}
 
 	@Patch('id/:id')
+	@ApiOperation({ 
+		summary: 'Update user by ID', 
+		description: 'Update user information by numeric ID. Requires authentication and ownership verification.' 
+	})
 	@ResourceOwner('id', 'params')
 	@UseGuards(ResourceOwnerGuard)
 	@HttpCode(HttpStatus.OK)
@@ -82,6 +102,10 @@ export class UsersController {
 	}
 
 	@Patch('uuid/:uuid')
+	@ApiOperation({ 
+		summary: 'Update user by UUID', 
+		description: 'Update user information by UUID (for guests). Requires authentication and ownership verification.' 
+	})
 	@ResourceOwner('uuid', 'params')
 	@UseGuards(ResourceOwnerGuard)
 	@HttpCode(HttpStatus.OK)
@@ -95,6 +119,10 @@ export class UsersController {
 	}
 
 	@Delete('id/:id')
+	@ApiOperation({ 
+		summary: 'Delete user by ID', 
+		description: 'Delete user account by numeric ID. Requires authentication and ownership verification.' 
+	})
 	@ResourceOwner('id', 'params')
 	@UseGuards(ResourceOwnerGuard)
 	@HttpCode(HttpStatus.OK)
@@ -107,6 +135,10 @@ export class UsersController {
 	}
 
 	@Delete('uuid/:uuid')
+	@ApiOperation({ 
+		summary: 'Delete user by UUID', 
+		description: 'Delete user account by UUID (for guests). Requires authentication and ownership verification.' 
+	})
 	@ResourceOwner('uuid', 'params')
 	@UseGuards(ResourceOwnerGuard)
 	@HttpCode(HttpStatus.OK)
