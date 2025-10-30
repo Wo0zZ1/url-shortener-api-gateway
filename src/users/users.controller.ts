@@ -2,7 +2,6 @@ import {
 	Controller,
 	Get,
 	Patch,
-	Delete,
 	Param,
 	ParseIntPipe,
 	Body,
@@ -20,8 +19,6 @@ import {
 	GetUserByUuidResponse,
 	UpdateUserByIdResponse,
 	UpdateUserByUuidResponse,
-	DeleteUserByIdResponse,
-	DeleteUserByUuidResponse,
 } from '@wo0zz1/url-shortener-shared'
 
 import {
@@ -116,37 +113,5 @@ export class UsersController {
 	): Promise<UpdateUserByUuidResponse> {
 		const userHeaders = getUserHeaders(request)
 		return this.usersHttpClient.updateByUuid(uuid, updateUserDto, userHeaders)
-	}
-
-	@Delete('id/:id')
-	@ApiOperation({ 
-		summary: 'Delete user by ID', 
-		description: 'Delete user account by numeric ID. Requires authentication and ownership verification.' 
-	})
-	@ResourceOwner('id', 'params')
-	@UseGuards(ResourceOwnerGuard)
-	@HttpCode(HttpStatus.OK)
-	async delete(
-		@Req() request: Request,
-		@Param('id', ParseIntPipe) id: number,
-	): Promise<DeleteUserByIdResponse> {
-		const userHeaders = getUserHeaders(request)
-		return this.usersHttpClient.deleteById(id, userHeaders)
-	}
-
-	@Delete('uuid/:uuid')
-	@ApiOperation({ 
-		summary: 'Delete user by UUID', 
-		description: 'Delete user account by UUID (for guests). Requires authentication and ownership verification.' 
-	})
-	@ResourceOwner('uuid', 'params')
-	@UseGuards(ResourceOwnerGuard)
-	@HttpCode(HttpStatus.OK)
-	async deleteByUuid(
-		@Req() request: Request,
-		@Param('uuid') uuid: string,
-	): Promise<DeleteUserByUuidResponse> {
-		const userHeaders = getUserHeaders(request)
-		return this.usersHttpClient.deleteByUuid(uuid, userHeaders)
 	}
 }

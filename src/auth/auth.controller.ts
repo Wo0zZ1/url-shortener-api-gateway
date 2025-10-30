@@ -22,6 +22,7 @@ import {
 	LogoutAllResponse,
 	GetActiveSessionsResponse,
 	RevokeSessionResponse,
+	DeleteUserResponse,
 	RegisterGuestResponse,
 	RegisterUserDto,
 	RegisterUserResponse,
@@ -215,5 +216,29 @@ export class AuthController {
 	): Promise<RevokeSessionResponse> {
 		const userHeaders = getUserHeaders(request)
 		return this.authHttpClient.revokeSession(userId, jti, userHeaders)
+	}
+
+	@Delete('user/:userId')
+	@ApiOperation({
+		summary: 'Delete user',
+		description:
+			'Delete user account and all associated authentication data. Requires authentication and ownership verification. This action cannot be undone.',
+	})
+	@ApiBearerAuth('access-token')
+	@ApiSecurity('x-guest-uuid')
+	@ResourceOwner('userId', 'params')
+	@UseGuards(AuthGuard, ResourceOwnerGuard)
+	@HttpCode(HttpStatus.OK)
+	async deleteUser(
+		@Param('userId', ParseIntPipe) userId: number,
+		@Req() request: RequestWithUser,
+		@Res({ passthrough: true }) response: Response,
+	): Promise<DeleteUserResponse> {
+		const userHeaders = getUserHeaders(request)
+		const result = await this.authHttpClient.deleteUser(userId, userHeaders)
+
+		response.clearCookie('refreshToken')
+
+		return result
 	}
 }

@@ -8,6 +8,7 @@ import {
 	CreateLinkResponse,
 	GetLinkByShortLinkResponse,
 	DeleteLinkResponse,
+	DeleteUserLinksResponse,
 	GetLinkStatsResponse,
 	GetQRCodeResponse,
 	GetUserLinksStatsResponse,
@@ -137,6 +138,24 @@ export class LinksHttpClient {
 			return response.data
 		} catch (error) {
 			this.handleError(error, 'Failed to delete link')
+			throw error
+		}
+	}
+
+	async deleteUserLinks(
+		userId: number,
+		userHeaders: UserHeaders,
+	): Promise<DeleteUserLinksResponse> {
+		try {
+			const response = await firstValueFrom(
+				this.httpService.delete<DeleteUserLinksResponse>(
+					`${this.baseUrl}/links/user/${userId}`,
+					{ headers: this.getGatewayHeaders(userHeaders) },
+				),
+			)
+			return response.data
+		} catch (error) {
+			this.handleError(error, 'Failed to delete user links')
 			throw error
 		}
 	}

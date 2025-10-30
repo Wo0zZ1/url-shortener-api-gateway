@@ -10,8 +10,6 @@ import {
 	GetUserByUuidResponse,
 	UpdateUserByIdResponse,
 	UpdateUserByUuidResponse,
-	DeleteUserByIdResponse,
-	DeleteUserByUuidResponse,
 	UserHeaders,
 } from '@wo0zz1/url-shortener-shared'
 
@@ -159,42 +157,6 @@ export class UsersHttpClient {
 			return response.data
 		} catch (error) {
 			this.handleError(error, 'Failed to update user by UUID')
-			throw error
-		}
-	}
-
-	async deleteById(
-		id: number,
-		userHeaders: UserHeaders,
-	): Promise<DeleteUserByIdResponse> {
-		try {
-			const response = await firstValueFrom(
-				this.httpService.delete<DeleteUserByIdResponse>(
-					`${this.baseUrl}/users/id/${id}`,
-					{ headers: this.getGatewayHeaders(userHeaders) },
-				),
-			)
-			return response.data
-		} catch (error) {
-			this.handleError(error, 'Failed to delete user')
-			throw error
-		}
-	}
-
-	async deleteByUuid(
-		uuid: string,
-		userHeaders: UserHeaders,
-	): Promise<DeleteUserByUuidResponse> {
-		try {
-			const response = await firstValueFrom(
-				this.httpService.delete<DeleteUserByUuidResponse>(
-					`${this.baseUrl}/users/uuid/${uuid}`,
-					{ headers: this.getGatewayHeaders(userHeaders) },
-				),
-			)
-			return response.data
-		} catch (error) {
-			this.handleError(error, 'Failed to delete user by UUID')
 			throw error
 		}
 	}

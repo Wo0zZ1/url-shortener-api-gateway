@@ -22,6 +22,7 @@ import {
 	CreateLinkResponse,
 	GetLinkStatsResponse,
 	DeleteLinkResponse,
+	DeleteUserLinksResponse,
 	GetUserLinksStatsResponse,
 } from '@wo0zz1/url-shortener-shared'
 
@@ -74,6 +75,23 @@ export class LinksController {
 	): Promise<CreateLinkResponse> {
 		const userHeaders = getUserHeaders(request)
 		return this.linksHttpClient.createLink(userId, createLinkDto, userHeaders)
+	}
+
+	@Delete('user/:userId')
+	@ApiOperation({
+		summary: 'Delete all user links',
+		description:
+			'Delete all links for a specific user. Requires authentication and ownership verification.',
+	})
+	@HttpCode(HttpStatus.OK)
+	@ResourceOwner('userId', 'params')
+	@UseGuards(ResourceOwnerGuard)
+	async deleteUserLinks(
+		@Req() request: RequestWithUser,
+		@Param('userId', ParseIntPipe) userId: number,
+	): Promise<DeleteUserLinksResponse> {
+		const userHeaders = getUserHeaders(request)
+		return this.linksHttpClient.deleteUserLinks(userId, userHeaders)
 	}
 
 	@Get(':shortLink/stats')

@@ -12,14 +12,10 @@ import {
 	RefreshTokenResponse,
 	GetActiveSessionsResponse,
 	RevokeSessionResponse,
+	DeleteUserResponse,
 	LogoutResponse,
 	LogoutAllResponse,
 	GetCurrentUserResponse,
-	UserEntity,
-	Tokens,
-	UserDataFromAccessTokenPayload,
-	RefreshTokenPayload,
-	MessageResponse,
 	UserHeaders,
 } from '@wo0zz1/url-shortener-shared'
 
@@ -45,7 +41,7 @@ export class AuthHttpClient {
 		}
 	}
 
-	async registerGuest(): Promise<{ createdUser: UserEntity }> {
+	async registerGuest(): Promise<RegisterGuestResponse> {
 		try {
 			const response = await firstValueFrom(
 				this.httpService.post<RegisterGuestResponse>(
@@ -64,16 +60,14 @@ export class AuthHttpClient {
 	async registerUser(
 		registerDto: RegisterUserDto,
 		guestUuid?: string,
-	): Promise<{ createdUser: UserEntity }> {
+	): Promise<RegisterUserResponse> {
 		try {
-			const url = guestUuid
-				? `${this.baseUrl}/auth/register-user?guestUuid=${guestUuid}`
-				: `${this.baseUrl}/auth/register-user`
-
 			const response = await firstValueFrom(
-				this.httpService.post<RegisterUserResponse>(url, registerDto, {
-					headers: this.getGatewayHeaders(),
-				}),
+				this.httpService.post<RegisterUserResponse>(
+					`${this.baseUrl}/auth/register-user`,
+					registerDto,
+					{ headers: { ...this.getGatewayHeaders(), 'x-guest-uuid': guestUuid } },
+				),
 			)
 			return response.data
 		} catch (error) {
@@ -82,10 +76,7 @@ export class AuthHttpClient {
 		}
 	}
 
-	async login(
-		loginDto: LoginDto,
-		guestUuid?: string,
-	): Promise<{ user: UserDataFromAccessTokenPayload; tokens: Tokens }> {
+	async login(loginDto: LoginDto, guestUuid?: string): Promise<LoginResponse> {
 		try {
 			const response = await firstValueFrom(
 				this.httpService.post<LoginResponse>(`${this.baseUrl}/auth/login`, loginDto, {
@@ -99,9 +90,7 @@ export class AuthHttpClient {
 		}
 	}
 
-	async refreshTokens(
-		refreshTokenDto: RefreshTokenDto,
-	): Promise<{ accessToken: string; refreshToken: string }> {
+	async refreshTokens(refreshTokenDto: RefreshTokenDto): Promise<RefreshTokenResponse> {
 		try {
 			const response = await firstValueFrom(
 				this.httpService.post<RefreshTokenResponse>(
@@ -117,7 +106,7 @@ export class AuthHttpClient {
 		}
 	}
 
-	async logout(logoutDto: LogoutDto): Promise<MessageResponse> {
+	async logout(logoutDto: LogoutDto): Promise<LogoutResponse> {
 		try {
 			const response = await firstValueFrom(
 				this.httpService.post<LogoutResponse>(`${this.baseUrl}/auth/logout`, logoutDto, {
@@ -131,7 +120,7 @@ export class AuthHttpClient {
 		}
 	}
 
-	async logoutAll(logoutDto: LogoutDto): Promise<MessageResponse> {
+	async logoutAll(logoutDto: LogoutDto): Promise<LogoutAllResponse> {
 		try {
 			const response = await firstValueFrom(
 				this.httpService.post<LogoutAllResponse>(
@@ -147,7 +136,7 @@ export class AuthHttpClient {
 		}
 	}
 
-	async getCurrentUser(accessToken: string): Promise<UserDataFromAccessTokenPayload> {
+	async getCurrentUser(accessToken: string): Promise<GetCurrentUserResponse> {
 		try {
 			const response = await firstValueFrom(
 				this.httpService.get<GetCurrentUserResponse>(`${this.baseUrl}/auth/me`, {
@@ -167,7 +156,7 @@ export class AuthHttpClient {
 	async getActiveSessions(
 		userId: number,
 		userHeaders: UserHeaders,
-	): Promise<RefreshTokenPayload[]> {
+	): Promise<GetActiveSessionsResponse> {
 		try {
 			const response = await firstValueFrom(
 				this.httpService.get<GetActiveSessionsResponse>(
@@ -186,7 +175,7 @@ export class AuthHttpClient {
 		userId: number,
 		jti: number,
 		userHeaders: UserHeaders,
-	): Promise<MessageResponse> {
+	): Promise<RevokeSessionResponse> {
 		try {
 			const response = await firstValueFrom(
 				this.httpService.delete<RevokeSessionResponse>(
@@ -197,6 +186,24 @@ export class AuthHttpClient {
 			return response.data
 		} catch (error) {
 			this.handleError(error, 'Failed to revoke session')
+			throw error
+		}
+	}
+
+	async deleteUser(
+		userId: number,
+		userHeaders: UserHeaders,
+	): Promise<DeleteUserResponse> {
+		try {
+			const response = await firstValueFrom(
+				this.httpService.delete<DeleteUserResponse>(
+					`${this.baseUrl}/auth/user/${userId}`,
+					{ headers: this.getGatewayHeaders(userHeaders) },
+				),
+			)
+			return response.data
+		} catch (error) {
+			this.handleError(error, 'Failed to delete user')
 			throw error
 		}
 	}
